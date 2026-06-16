@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase & Cloudinary -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+    <style>
+        :root { --gold: #D4AF37; --cream: #FFFDF5; --dark-cocoa: #2C1810; --gold-light: #e5c55d; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--cream); color: var(--dark-cocoa); overflow-x: hidden; }
+        .serif { font-family: 'Playfair Display', serif; }
+
+        .animate-entry { opacity: 0; animation: slideUp 0.8s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Floating Label Logic */
+        .form-group { position: relative; margin-bottom: 2.5rem; }
+
+        .form-group input, .form-group textarea {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(44, 24, 16, 0.2);
+            padding: 12px 0; font-size: 1rem; color: var(--dark-cocoa); outline: none; transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .form-group label {
+            position: absolute; top: 12px; left: 0; font-size: 0.9rem; color: #888;
+            pointer-events: none; transition: all 0.3s ease; font-weight: 300;
+        }
+
+        /* Float Label on Focus or Value */
+        .form-group input:focus, .form-group textarea:focus { border-bottom-color: var(--gold); padding-left: 5px; }
+
+        .form-group input:focus ~ label, .form-group input:not(:placeholder-shown) ~ label,
+        .form-group textarea:focus ~ label, .form-group textarea:not(:placeholder-shown) ~ label {
+            top: -12px; font-size: 0.65rem; color: var(--gold); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+        }
+
+        /* Custom Button */
+        .btn-gold {
+            background-image: linear-gradient(to right, var(--dark-cocoa) 0%, #4a2c20 51%, var(--dark-cocoa) 100%);
+            background-size: 200% auto; transition: 0.5s;
+        }
+        .btn-gold:hover {
+            background-position: right center; background-image: linear-gradient(to right, var(--gold) 0%, var(--gold-light) 51%, var(--gold) 100%);
+            color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .photo-preview {
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+            border: 3px solid white; box-shadow: 0 0 0 2px var(--gold);
+            margin-right: 24px; transition: transform 0.3s;
+        }
+        .photo-preview:hover { transform: scale(1.05); }
+
+        /* Split Screen Visual */
+        .image-side {
+            background-image: url('https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover; background-position: center;
+        }
+        .overlay-gradient { background: linear-gradient(to top, rgba(44, 24, 16, 0.5), rgba(44, 24, 16, 0.2)); }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center bg-[#fcf9f2] p-4 md:p-0">
+
+    <div class="w-full h-full md:h-auto md:max-w-[1200px] md:aspect-[16/9] bg-white shadow-2xl flex overflow-hidden rounded-none md:rounded-xl animate-entry relative ring-1 ring-black/5">
+
+        <!-- Navigation within Modal -->
+        <a href="{% url 'profile' %}" class="absolute top-8 right-8 z-20 text-gray-400 hover:text-dark-cocoa transition-colors text-[10px] uppercase tracking-widest font-bold flex items-center gap-2 group">
+            Cancel <span class="text-xl group-hover:rotate-90 transition-transform duration-300">&times;</span>
+        </a>
+
+        <!-- Left Side: Form -->
+        <div class="w-full md:w-7/12 flex flex-col justify-center p-8 md:p-16 lg:p-20 relative overflow-y-auto bg-white">
+
+            <div class="mb-10">
+                <p class="text-gold text-xs uppercase tracking-[0.25em] font-bold mb-3">Update Details</p>
+                <h1 class="text-4xl md:text-5xl serif text-dark-cocoa leading-tight">Edit <span class="italic text-gray-400">Profile</span></h1>
+            </div>
+
+            <form id="editProfileForm" autocomplete="off" class="space-y-2">
+
+                <!-- Photo Upload Section -->
+                <div class="flex items-center mb-10 pb-8 border-b border-dashed border-gray-200">
+                    <img id="previewImg" src="https://via.placeholder.com/100?text=IMG" class="photo-preview">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 mb-3">Profile Photo</p>
+                        <button type="button" id="uploadWidgetBtn" class="text-[9px] uppercase tracking-[0.2em] border border-gray-300 px-5 py-3 hover:border-gold hover:text-gold transition-all text-dark-cocoa">
+                            Change Photo
+                        </button>
+                        <input type="hidden" id="photoUrl">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="form-group">
+                        <input type="text" id="username" placeholder=" ">
+                        <label>Display Name</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="phone" placeholder=" ">
+                        <label>Phone Number</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="location" placeholder=" ">
+                    <label>Residence / Location</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="favorite_flavor" placeholder=" ">
+                    <label>Favorite Cake Flavor</label>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="bio" rows="2" placeholder=" " style="resize: none;"></textarea>
+                    <label>Short Bio</label>
+                </div>
+
+                <button type="submit" id="saveBtn" class="w-full btn-gold text-white py-4 px-6 uppercase text-[10px] tracking-[0.25em] font-bold shadow-xl mt-4 rounded-sm flex justify-center items-center gap-2">
+                    Save Changes
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Right Side: Visuals -->
+        <div class="hidden md:flex w-5/12 image-side relative flex-col justify-between p-12 text-white">
+            <div class="absolute inset-0 overlay-gradient"></div>
+
+            <div class="relative z-10 text-right">
+                <h3 class="text-2xl font-bold tracking-widest serif">NELCAY.</h3>
+            </div>
+
+            <div class="relative z-10">
+                <div class="w-12 h-1 bg-gold mb-6"></div>
+                <blockquote class="serif italic text-3xl leading-snug mb-4">
+                    "Details create the big picture."
+                </blockquote>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4GMFz5_naMtMHlqO0SepO-NnLptLHV2M",
+            authDomain: "nelcay-web.firebaseapp.com",
+            databaseURL: "https://nelcay-web-default-rtdb.firebaseio.com",
+            projectId: "nelcay-web",
+            storageBucket: "nelcay-web.firebasestorage.app",
+            messagingSenderId: "815189958408",
+            appId: "1:815189958408:web:82f45f1a1f8acc732b56bd",
+            measurementId: "G-X4JDRWDEDE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        let currentUser = null;
+
+        // --- 2. CLOUDINARY CONFIG ---
+        // Replace these with your actual Cloudinary details
+        const CLOUD_NAME = "app_images";
+        const UPLOAD_PRESET = "drx3tzhrk";
+
+        // --- 3. LOAD DATA ---
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                const userRef = database.ref('users/' + user.uid);
+
+                userRef.once('value').then((snapshot) => {
+                    const data = snapshot.val() || {};
+
+                    if(document.getElementById('username')) {
+                        document.getElementById('username').value = data.username || user.displayName || "";
+                        document.getElementById('phone').value = data.phone || "";
+                        document.getElementById('location').value = data.location || "";
+                        document.getElementById('favorite_flavor').value = data.favorite_flavor || "";
+                        document.getElementById('bio').value = data.bio || "";
+
+                        if(data.profile_pic_url) {
+                            document.getElementById('previewImg').src = data.profile_pic_url;
+                            document.getElementById('photoUrl').value = data.profile_pic_url;
+                        }
+                    }
+                });
+            } else {
+                window.location.href = "{% url 'login' %}";
+            }
+        });
+
+        // --- 4. CLOUDINARY WIDGET ---
+        const myWidget = cloudinary.createUploadWidget({
+            cloudName: CLOUD_NAME,
+            uploadPreset: UPLOAD_PRESET,
+            sources: ['local', 'url', 'camera'],
+            multiple: false,
+            cropping: true,
+            showSkipCropButton: false,
+            croppingAspectRatio: 1,
+            folder: "nelcay_users"
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                document.getElementById('previewImg').src = result.info.secure_url;
+                document.getElementById('photoUrl').value = result.info.secure_url;
+            }
+        });
+
+        document.getElementById("uploadWidgetBtn").addEventListener("click", function() {
+            myWidget.open();
+        }, false);
+
+        // --- 5. SAVE DATA ---
+        document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('saveBtn');
+            btn.textContent = "Saving...";
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            btn.disabled = true;
+
+            const updates = {
+                username: document.getElementById('username').value,
+                phone: document.getElementById('phone').value,
+                location: document.getElementById('location').value,
+                favorite_flavor: document.getElementById('favorite_flavor').value,
+                bio: document.getElementById('bio').value,
+                profile_pic_url: document.getElementById('photoUrl').value,
+                email: currentUser.email
+            };
+
+            database.ref('users/' + currentUser.uid).update(updates)
+                .then(() => {
+                    if(updates.username) {
+                        currentUser.updateProfile({ displayName: updates.username });
+                    }
+                    window.location.href = "{% url 'profile' %}";
+                })
+                .catch((error) => {
+                    console.error(error);
+                    alert("Error: " + error.message);
+                    btn.textContent = "Save Changes";
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btn.disabled = false;
+                });
+        });
+    </script>
+</body>
+</html>

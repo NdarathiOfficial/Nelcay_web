@@ -1,0 +1,231 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs (Compat version for easier HTML integration) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
+
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --cream: #FFFDF5;
+            --dark-cocoa: #2C1810;
+            --gold-light: #e5c55d;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark-cocoa);
+        }
+
+        .serif { font-family: 'Playfair Display', serif; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(44, 24, 16, 0.2);
+            padding: 12px 0;
+            font-size: 1rem;
+            color: var(--dark-cocoa);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            font-size: 0.9rem;
+            color: #888;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            font-weight: 300;
+        }
+
+        .input-group input:focus {
+            border-bottom-color: var(--gold);
+            padding-left: 5px;
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label {
+            top: -12px;
+            font-size: 0.65rem;
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .image-side {
+            background-image: url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .overlay-gradient {
+            background: linear-gradient(to bottom, rgba(44, 24, 16, 0.3), rgba(44, 24, 16, 0.8));
+        }
+
+        .btn-gold {
+            background-image: linear-gradient(to right, var(--dark-cocoa) 0%, #4a2c20 51%, var(--dark-cocoa) 100%);
+            background-size: 200% auto;
+            transition: 0.5s;
+        }
+        .btn-gold:hover {
+            background-position: right center;
+            background-image: linear-gradient(to right, var(--gold) 0%, var(--gold-light) 51%, var(--gold) 100%);
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .spinner {
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center bg-[#fcf9f2] p-4 md:p-0">
+
+    <div class="w-full h-full md:h-auto md:max-w-[1100px] md:aspect-[16/9] bg-white shadow-2xl flex overflow-hidden rounded-none md:rounded-2xl animate-fade-in relative ring-1 ring-black/5">
+
+        <a href="{% url 'index' %}" class="absolute top-6 right-6 z-20 text-gray-400 hover:text-gold transition-colors text-xs uppercase tracking-widest font-bold flex items-center gap-2 group">
+            Close <span class="text-xl group-hover:rotate-90 transition-transform duration-300">&times;</span>
+        </a>
+
+        <div class="hidden md:flex w-5/12 image-side relative flex-col justify-between p-12 text-white">
+            <div class="absolute inset-0 overlay-gradient"></div>
+
+            <div class="relative z-10">
+                <h3 class="text-3xl font-bold tracking-widest serif">NELCAY<span class="text-gold">.</span></h3>
+            </div>
+
+            <div class="relative z-10">
+                <div class="w-12 h-1 bg-gold mb-6"></div>
+                <blockquote class="serif italic text-3xl leading-snug mb-4">
+                    "Sweetness is the luxury of the soul."
+                </blockquote>
+                <p class="text-xs uppercase tracking-[0.3em] opacity-80">Artisanal Bakery</p>
+            </div>
+        </div>
+
+        <div class="w-full md:w-7/12 flex flex-col justify-center p-8 md:p-16 lg:p-20 relative bg-white">
+            <div class="max-w-md mx-auto w-full">
+                <div class="mb-12">
+                    <p class="text-gold text-xs uppercase tracking-[0.25em] font-bold mb-3">Client Access</p>
+                    <h2 class="text-4xl md:text-5xl serif text-dark-cocoa leading-tight">Welcome <br><span class="italic text-gray-400">Back</span></h2>
+                </div>
+
+                <div id="errorMessage" class="hidden mb-8 py-3 px-4 text-xs uppercase tracking-wide border-l-4 shadow-sm border-red-500 bg-red-50 text-red-700"></div>
+
+                <form id="firebaseLoginForm" class="space-y-6">
+                    <div class="input-group">
+                        <input type="email" id="email" required placeholder=" ">
+                        <label for="email">Email Address</label>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="password" required placeholder=" ">
+                        <label for="password">Password</label>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4">
+                        <a href="#" class="text-[10px] text-gray-400 hover:text-dark-cocoa transition-colors tracking-widest border-b border-transparent hover:border-gray-400 pb-0.5">FORGOT PASSWORD?</a>
+                        <button type="submit" id="submitBtn" class="btn-gold text-white px-10 py-4 text-[10px] uppercase tracking-[0.3em] font-bold shadow-lg rounded-sm flex items-center gap-2">
+                            <span>Sign In</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-16 pt-8 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-500 font-light tracking-wide">
+                        Not a member yet? <a href="{% url 'register' %}" class="text-dark-cocoa font-bold hover:text-gold transition-colors ml-1 uppercase text-[10px] tracking-widest">Create Account</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NELCAY FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4GMFz5_naMtMHlqO0SepO-NnLptLHV2M",
+            authDomain: "nelcay-web.firebaseapp.com",
+            databaseURL: "https://nelcay-web-default-rtdb.firebaseio.com",
+            projectId: "nelcay-web",
+            storageBucket: "nelcay-web.firebasestorage.app",
+            messagingSenderId: "815189958408",
+            appId: "1:815189958408:web:82f45f1a1f8acc732b56bd",
+            measurementId: "G-X4JDRWDEDE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics(); // Optional: Start analytics
+        const auth = firebase.auth();
+
+        // Login Handler
+        document.getElementById('firebaseLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+            const errorDiv = document.getElementById('errorMessage');
+
+            // UI Loading
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> <span>Signing In...</span>';
+            errorDiv.classList.add('hidden');
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    console.log("Logged in:", userCredential.user);
+                    // Redirect to Order Page
+                    window.location.href = "{% url 'order' %}";
+                })
+                .catch((error) => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Sign In</span>';
+                    // Show error
+                    let msg = error.message;
+                    if(error.code === 'auth/user-not-found') msg = "No account found with this email.";
+                    if(error.code === 'auth/wrong-password') msg = "Incorrect password.";
+                    errorDiv.textContent = msg;
+                    errorDiv.classList.remove('hidden');
+                });
+        });
+    </script>
+
+</body>
+</html>

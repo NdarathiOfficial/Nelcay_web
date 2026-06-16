@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Payment | Nelcay Cakey Treats</title>
+
+    <!-- Tailwind and Fonts from your design system -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Inheriting Nelcay's Premium Design System */
+        :root {
+            --gold: #D4AF37;
+            --cream: #FFFDF5;
+            --dark-cocoa: #2C1810;
+            --blush: #F8E8E8;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark-cocoa);
+            margin: 0;
+            padding: 0;
+        }
+
+        .bg-cream { background-color: var(--cream); }
+        .text-dark-cocoa { color: var(--dark-cocoa); }
+        .text-gold { color: var(--gold); }
+
+        .serif { font-family: 'Playfair Display', serif; }
+        .sans-serif { font-family: 'Montserrat', sans-serif; }
+
+        /* Nelcay Custom Spinner */
+        .nelcay-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--blush);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Reveal Animation */
+        .animate-reveal-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- I changed min-h-[75vh] to min-h-screen so it perfectly centers vertically without the navbar -->
+    <div class="min-h-screen flex items-center justify-center bg-cream px-6 sans-serif text-dark-cocoa">
+        <div class="max-w-lg w-full text-center animate-reveal-up">
+
+            <!-- Spinner -->
+            <div id="spinner-container" class="mb-10">
+                <div class="nelcay-spinner"></div>
+            </div>
+
+            <!-- Typography matching index.html -->
+            <h2 id="processing-title" class="text-4xl md:text-5xl mb-6 serif italic tracking-wide">
+                Awaiting M-Pesa
+            </h2>
+
+            <p id="status-message" class="text-gray-500 mb-10 max-w-sm mx-auto font-light leading-relaxed">
+                We've sent a prompt to your phone. Please enter your PIN to secure your order.
+            </p>
+
+            <!-- Button matching index.html 'Place Order' styling -->
+            <div id="action-buttons" class="hidden mt-8">
+                <a href="{% url 'payment' %}" class="inline-block px-10 py-4 border border-[#2C1810] text-[#2C1810] uppercase text-xs tracking-[0.3em] hover:bg-[#2C1810] hover:text-white transition-all duration-500">
+                    Try Again
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+<script>
+        let attempts = 0;
+        const MAX_ATTEMPTS = 60;
+
+        function pollPaymentStatus() {
+            fetch("{% url 'check_payment_status' %}?t=" + new Date().getTime())
+                .then(response => response.json())
+                .then(data => {
+                    console.log("DEBUG: Status received:", data);
+
+                    if (data.status === 'success') {
+                        showSuccess("Payment Successful!");
+                        // Wait 2 seconds for user to read success message before redirect
+                        setTimeout(() => {
+                            window.location.href = "{% url 'gallery' %}";
+                        }, 2000);
+                    }
+                    else if (data.status === 'pending') {
+                        attempts++;
+                        if (attempts >= MAX_ATTEMPTS) {
+                            showError("Payment timed out. Please try again.");
+                            return;
+                        }
+                        setTimeout(pollPaymentStatus, 7000);
+                    }
+                    else {
+                        showError(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error("Polling error:", error);
+                    setTimeout(pollPaymentStatus, 5000);
+                });
+        }
+
+        function showSuccess(message) {
+            const title = document.getElementById('processing-title');
+            const msgElement = document.getElementById('status-message');
+            const spinnerContainer = document.getElementById('spinner-container');
+
+            title.innerHTML = "Payment <span class='text-gold'>Confirmed</span>";
+            msgElement.innerText = message;
+            msgElement.className = "text-gold font-medium mb-10 max-w-sm mx-auto leading-relaxed";
+            // Replace spinner with a simple success icon or hide it
+            spinnerContainer.innerHTML = '<div class="text-6xl text-gold">✓</div>';
+        }
+
+        function showError(message) {
+            const title = document.getElementById('processing-title');
+            const msgElement = document.getElementById('status-message');
+            const spinnerContainer = document.getElementById('spinner-container');
+            const buttons = document.getElementById('action-buttons');
+
+            title.innerHTML = "Payment <span class='text-red-500'>Issue</span>";
+            msgElement.innerText = message;
+            msgElement.className = "text-red-500 font-medium mb-10 max-w-sm mx-auto leading-relaxed";
+            spinnerContainer.style.display = "none";
+            buttons.classList.remove('hidden');
+        }
+
+        window.onload = () => {
+            setTimeout(pollPaymentStatus, 2000);
+        };
+    </script>
+</body>
+</html>

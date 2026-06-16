@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nelcay Cakey Treats | Elegance in Every Bite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --cream: #FFFDF5;
+            --dark-cocoa: #2C1810;
+            --blush: #F8E8E8;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark-cocoa);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Custom Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-reveal {
+            opacity: 0;
+            transition: all 1s ease-out;
+            transform: translateY(40px);
+        }
+
+        .animate-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(rgba(255, 253, 245, 0.7), rgba(255, 253, 245, 0.3)),
+                        url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .gold-underline {
+            position: relative;
+        }
+
+        .gold-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background-color: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .gold-underline:hover::after {
+            width: 100px;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .cake-card {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cake-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--cream);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--blush);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .parallax-section {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="serif italic text-xl">Preparing Something Sweet...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 px-6 py-4 lg:px-16 flex justify-between items-center bg-transparent">
+        <a href="index.html" class="text-2xl font-bold tracking-widest serif">
+            NELCAY <span class="text-sm font-light block tracking-[0.3em] uppercase">Cakey Treats</span>
+        </a>
+
+        <div class="hidden lg:flex gap-8 items-center uppercase text-[10px] tracking-widest font-semibold">
+            <a href="{% url 'index' %}" class="nav-link">Home</a>
+            <a href="{% url 'about' %}" class="nav-link text-gold">Our Story</a>
+            <a href="{% url 'gallery' %}" class="nav-link">Gallery</a>
+            <a href="{% url 'pricing' %}" class="nav-link">Pricing</a>
+            <a href="{% url 'order' %}" class="nav-link">Order</a>
+            <a href="{% url 'contact' %}" class="px-5 py-2 border border-dark-cocoa hover:bg-dark-cocoa hover:text-white transition-all duration-300">Contact</a>
+        </div>
+
+        <button class="lg:hidden text-2xl" id="menuBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h16M4 16h16" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden hero-gradient">
+        <div class="text-center z-10 px-4">
+            <p class="uppercase tracking-[0.5em] text-sm mb-4 animate-reveal" style="transition-delay: 0.2s">Since 2018</p>
+            <h1 class="text-6xl md:text-8xl lg:text-9xl mb-6 animate-reveal" style="transition-delay: 0.4s">
+                Bespoke <br> <span class="italic text-[0.9em] text-gold">Confections</span>
+            </h1>
+            <p class="max-w-xl mx-auto text-lg mb-10 font-light animate-reveal" style="transition-delay: 0.6s">
+                Where artistry meets appetite. We craft unforgettable experiences through the medium of sugar, cream, and flour.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-reveal" style="transition-delay: 0.8s">
+                <a href="gallery.html" class="inline-block px-10 py-4 border border-dark-cocoa hover:bg-dark-cocoa hover:text-white transition-all duration-500 uppercase text-xs tracking-[0.3em]">
+                    The Gallery
+                </a>
+                <a href="order.html" class="inline-block px-10 py-4 bg-dark-cocoa text-white hover:bg-gold transition-all duration-500 uppercase text-xs tracking-[0.3em]">
+                    Place Order
+                </a>
+            </div>
+        </div>
+
+        <!-- Floating Elements -->
+        <div class="absolute bottom-10 left-10 opacity-20 hidden lg:block" style="animation: float 6s ease-in-out infinite">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="0.5"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- About Section Preview -->
+    <section id="about" class="py-24 px-6 lg:px-24 grid md:grid-cols-2 gap-16 items-center">
+        <div class="animate-reveal">
+            <p class="text-gold uppercase tracking-widest mb-4 font-semibold text-sm">Our Philosophy</p>
+            <h2 class="text-4xl md:text-5xl mb-8 leading-tight">Every slice tells <br> <span class="italic">a story of passion.</span></h2>
+            <div class="space-y-6 text-gray-600 leading-relaxed font-light">
+                <p>At Nelcay Cakey Treats, we believe that a cake is more than just a dessert; it is the centerpiece of life's most cherished celebrations. Whether it's a grand wedding or an intimate birthday, our mission is to create a visual and culinary masterpiece.</p>
+                <p>Led by our founder, <span class="font-semibold text-dark-cocoa">Caroline Wambui Ngure</span>, we source only the finest organic ingredients to ensure beauty is never at the expense of taste.</p>
+            </div>
+            <a href="{% url 'about' %}" class="mt-10 inline-block text-xs uppercase tracking-[0.2em] border-b border-gold pb-2 hover:text-gold transition-all">Read Our Full Story</a>
+        </div>
+        <div class="relative group overflow-hidden rounded-sm animate-reveal" style="transition-delay: 0.3s">
+            <img src="https://images.unsplash.com/photo-1535141192574-5d4897c12636?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Cake Process" class="w-full h-[600px] object-cover transition-transform duration-1000 group-hover:scale-110">
+            <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-all"></div>
+        </div>
+    </section>
+
+    <!-- Signature Creations -->
+    <section id="signature" class="py-24 bg-white">
+        <div class="text-center mb-16 px-6">
+            <h2 class="text-5xl mb-4 gold-underline pb-4 inline-block">Signature Creations</h2>
+            <p class="text-gray-500 font-light mt-4">Discover the favorites that defined our legacy.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-6 lg:px-24">
+            <!-- Card 1 -->
+            <div class="cake-card group">
+                <div class="relative overflow-hidden aspect-[4/5] mb-6">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_4PXqRjtOZ90cp-WHTr6PNUYm9HoJ0RD2fw&s" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700" alt="Velvet Rose">
+                    <div class="absolute inset-0 bg-dark-cocoa/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <a href="gallery.html" class="bg-white text-dark-cocoa px-6 py-2 text-[10px] tracking-widest uppercase font-bold">Details</a>
+                    </div>
+                </div>
+                <h3 class="text-2xl mb-2">Velvet Rose Blossom</h3>
+                <p class="text-gray-500 text-sm font-light mb-4 italic">Champagne infused sponge with wild raspberry coulis.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="cake-card group" style="transition-delay: 0.1s">
+                <div class="relative overflow-hidden aspect-[4/5] mb-6">
+                    <img src="https://images.unsplash.com/photo-1621303837174-89787a7d4729?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700" alt="Golden Truffle">
+                    <div class="absolute inset-0 bg-dark-cocoa/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <a href="gallery.html" class="bg-white text-dark-cocoa px-6 py-2 text-[10px] tracking-widest uppercase font-bold">Details</a>
+                    </div>
+                </div>
+                <h3 class="text-2xl mb-2">Midnight Gold Truffle</h3>
+                <p class="text-gray-500 text-sm font-light mb-4 italic">70% dark chocolate ganache with salted caramel & gold leaf.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="cake-card group" style="transition-delay: 0.2s">
+                <div class="relative overflow-hidden aspect-[4/5] mb-6">
+                    <img src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700" alt="Vintage Pearl">
+                    <div class="absolute inset-0 bg-dark-cocoa/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <a href="gallery.html" class="bg-white text-dark-cocoa px-6 py-2 text-[10px] tracking-widest uppercase font-bold">Details</a>
+                    </div>
+                </div>
+                <h3 class="text-2xl mb-2">Vintage Pearl Vanilla</h3>
+                <p class="text-gray-500 text-sm font-light mb-4 italic">Tahitian vanilla bean buttercream with white chocolate pearls.</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-16">
+            <a href="gallery.html" class="px-12 py-4 border border-dark-cocoa uppercase text-[10px] tracking-[0.4em] hover:bg-dark-cocoa hover:text-white transition-all duration-500">View All Collections</a>
+        </div>
+    </section>
+
+    <!-- Quote Banner -->
+    <section class="py-32 parallax-section relative text-white" style="background-image: url('https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')">
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="relative z-10 text-center px-6">
+            <h2 class="text-3xl md:text-5xl italic serif max-w-4xl mx-auto leading-tight">
+                "Life is uncertain. Eat dessert first, and make sure it's as beautiful as the occasion it celebrates."
+            </h2>
+            <p class="mt-8 uppercase tracking-[0.4em] text-xs font-semibold">— Nelcay Cakey Treats</p>
+        </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <section class="py-24 text-center bg-cream">
+        <div class="animate-reveal">
+            <h2 class="text-4xl md:text-5xl mb-6 serif">Ready for something <span class="italic text-gold">extraordinary?</span></h2>
+            <p class="text-gray-500 mb-10 max-w-xl mx-auto font-light leading-relaxed">Whether it is a custom wedding cake or a box of artisanal treats, we are ready to bring your vision to life.</p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="order.html" class="px-10 py-4 bg-dark-cocoa text-white uppercase text-xs tracking-widest hover:bg-gold transition-all duration-500">Start Your Order</a>
+                <a href="contact.html" class="px-10 py-4 border border-dark-cocoa uppercase text-xs tracking-widest hover:bg-dark-cocoa hover:text-white transition-all duration-500">Get in Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-cocoa text-white/80 py-16 px-6 lg:px-24">
+        <div class="flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-12 mb-8">
+            <div class="text-3xl serif mb-8 md:mb-0">
+                NELCAY <span class="text-gold">.</span>
+            </div>
+            <div class="flex flex-wrap justify-center gap-8 text-[10px] uppercase tracking-widest font-medium">
+                <a href="{% url 'index' %}" class="hover:text-gold transition-colors">Home</a>
+                <a href="a{% url 'about' %}" class="hover:text-gold transition-colors">Our Story</a>
+                <a href="{% url 'gallery' %}" class="hover:text-gold transition-colors">Gallery</a>
+                <a href="{% url 'pricing' %}" class="hover:text-gold transition-colors">Pricing</a>
+                <a href="{% url 'order' %}" class="hover:text-gold transition-colors">Order</a>
+                <a href="{% url 'contact' %}" class="hover:text-gold transition-colors">Contact</a>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center text-[10px] uppercase tracking-widest">
+            <p>© 2024 Nelcay Cakey Treats. All rights reserved.</p>
+            <div class="flex gap-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-gold">Instagram</a>
+                <a href="#" class="hover:text-gold">Pinterest</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-white', 'shadow-md', 'py-2');
+                nav.classList.remove('bg-transparent', 'py-4');
+                nav.style.color = 'var(--dark-cocoa)';
+            } else {
+                nav.classList.remove('bg-white', 'shadow-md', 'py-2');
+                nav.classList.add('bg-transparent', 'py-4');
+                nav.style.color = '';
+            }
+        });
+
+        // Intersection Observer for Reveal Animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Loader
+        window.onload = () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 800);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+{% load static %}
+
+{% block title %}Baker's Portal | Nelcay Management{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Montserrat', 'sans-serif'],
+                    serif: ['Playfair Display', 'serif']
+                },
+                colors: {
+                    gold: '#D4AF37',
+                    cream: '#FFFDF5',
+                    'dark-cocoa': '#2C1810',
+                    blush: '#F8E8E8',
+                    'gold-light': '#F4E5B0'
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.8s ease-out forwards',
+                },
+                keyframes: {
+                    fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                }
+            }
+        }
+    }
+</script>
+<style>
+    body {
+        background-color: #FFFDF5; /* Cream Background */
+        color: #2C1810; /* Dark Cocoa Text */
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #FFFDF5; }
+    ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 3px; }
+
+    /* Admin Card Styling */
+    .admin-card {
+        background: white;
+        border: 1px solid rgba(212, 175, 55, 0.15); /* Subtle Gold Border */
+        box-shadow: 0 4px 20px rgba(44, 24, 16, 0.03);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    }
+    .admin-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(44, 24, 16, 0.08);
+        border-color: rgba(212, 175, 55, 0.4);
+    }
+
+    /* Sidebar Links */
+    .sidebar-link {
+        position: relative;
+        transition: all 0.3s ease;
+        border-right: 3px solid transparent;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #D4AF37;
+        border-right-color: #D4AF37;
+    }
+
+    /* Elegant Inputs */
+    .input-elegant {
+        background: #F8E8E8; /* Blush */
+        border: none;
+        border-bottom: 1px solid #D4AF37;
+        color: #2C1810;
+        transition: all 0.3s ease;
+    }
+    .input-elegant:focus {
+        outline: none;
+        background: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    
+    .status-badge {
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        font-size: 0.65rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen relative font-sans flex flex-col lg:flex-row">
+
+    <!-- Sidebar Navigation (Desktop) -->
+    <!-- Styled in Dark Cocoa for contrast and "Admin" feel -->
+    <aside class="hidden lg:flex flex-col w-64 bg-dark-cocoa text-cream border-r border-gold/20 fixed h-full z-20">
+        <div class="p-10">
+            <h1 class="text-2xl font-bold tracking-widest font-serif">NELCAY<span class="text-gold">.</span></h1>
+            <p class="text-[10px] uppercase tracking-[0.3em] opacity-70 mt-1">Baker Portal</p>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="#" class="sidebar-link active flex items-center gap-4 px-6 py-4 text-sm uppercase tracking-widest font-medium">
+                <i class="fas fa-th-large text-gold"></i>
+                <span>Active Orders</span>
+            </a>
+            <a href="#" class="sidebar-link flex items-center gap-4 px-6 py-4 text-sm uppercase tracking-widest font-medium opacity-70 hover:opacity-100">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="#" class="sidebar-link flex items-center gap-4 px-6 py-4 text-sm uppercase tracking-widest font-medium opacity-70 hover:opacity-100">
+                <i class="fas fa-users"></i>
+                <span>Clients</span>
+            </a>
+            <a href="#" class="sidebar-link flex items-center gap-4 px-6 py-4 text-sm uppercase tracking-widest font-medium opacity-70 hover:opacity-100">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-8 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border border-gold flex items-center justify-center text-gold font-serif text-lg">
+                    C
+                </div>
+                <div>
+                    <p class="text-sm font-semibold font-serif">Caroline N.</p>
+                    <p class="text-[10px] uppercase tracking-widest text-green-400">● Online</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 lg:ml-64 p-6 lg:p-12 bg-cream">
+        
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 animate-fade-in">
+            <div>
+                <p class="text-gold uppercase tracking-[0.2em] text-xs font-semibold mb-2">Welcome Back</p>
+                <h2 class="text-4xl md:text-5xl font-serif text-dark-cocoa">Dashboard</h2>
+            </div>
+            
+            <div class="flex gap-4">
+                <!-- Stat Card 1 -->
+                <div class="bg-white px-8 py-4 border-l-4 border-gold shadow-sm">
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-1">Pending Orders</p>
+                    <p class="text-3xl font-serif text-dark-cocoa">{{ pending_orders_count|default:"12" }}</p>
+                </div>
+                <!-- Stat Card 2 -->
+                <div class="bg-white px-8 py-4 border-l-4 border-dark-cocoa shadow-sm">
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-1">Delivery Today</p>
+                    <p class="text-3xl font-serif text-dark-cocoa">{{ delivery_today_count|default:"4" }}</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Active Orders Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+            {% for order in orders %} 
+            <div class="admin-card p-0 relative group animate-fade-in">
+                <!-- Decorative Top Border -->
+                <div class="h-1 w-full bg-gold/50"></div>
+
+                <div class="p-8">
+                    <!-- Top Row -->
+                    <div class="flex justify-between items-start mb-6 pb-6 border-b border-dashed border-gray-200">
+                        <div>
+                            <span class="status-badge bg-blush text-dark-cocoa px-3 py-1 rounded-sm">
+                                #{{ order.id|default:"ORD-8821" }}
+                            </span>
+                            <h3 class="text-2xl font-serif text-dark-cocoa mt-3 group-hover:text-gold transition-colors">
+                                {{ order.cake_name|default:"Royal Red Velvet Tier" }}
+                            </h3>
+                            <p class="text-xs uppercase tracking-widest mt-1 text-gray-500">
+                                <i class="fas fa-calendar-alt mr-2 text-gold"></i> Due: {{ order.delivery_date|default:"Oct 24, 2026" }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400">Client</p>
+                            <p class="font-serif text-lg text-dark-cocoa">{{ order.client_name|default:"Alice Wanjiku" }}</p>
+                            <a href="tel:{{ order.client_phone }}" class="text-xs font-semibold text-gold hover:text-dark-cocoa transition-colors">
+                                {{ order.client_phone|default:"+254 700 123 456" }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        
+                        <!-- Specifications -->
+                        <div>
+                            <h4 class="text-xs uppercase tracking-[0.2em] font-bold text-gold mb-4">Specifications</h4>
+                            <ul class="space-y-3 text-sm text-gray-600 font-light">
+                                <li class="flex justify-between border-b border-gray-100 pb-1">
+                                    <span>Flavor</span> <span class="font-medium text-dark-cocoa">{{ order.flavor|default:"Vanilla & Passion" }}</span>
+                                </li>
+                                <li class="flex justify-between border-b border-gray-100 pb-1">
+                                    <span>Weight</span> <span class="font-medium text-dark-cocoa">{{ order.weight|default:"3.5 Kg" }}</span>
+                                </li>
+                                <li class="flex justify-between border-b border-gray-100 pb-1">
+                                    <span>Theme</span> <span class="font-medium text-dark-cocoa">{{ order.theme|default:"Gold Wedding" }}</span>
+                                </li>
+                                <li class="mt-3 text-xs italic text-gray-500 bg-cream p-3 border-l-2 border-gold">
+                                    "{{ order.custom_note|default:"Less sugar on the frosting please." }}"
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Financials -->
+                        <div>
+                            <h4 class="text-xs uppercase tracking-[0.2em] font-bold text-dark-cocoa mb-4">Financials</h4>
+                            <ul class="space-y-3 text-sm text-gray-600 font-light">
+                                <li class="flex justify-between">
+                                    <span>Base Price</span> <span>KES {{ order.base_price|default:"8,000" }}</span>
+                                </li>
+                                <li class="flex justify-between text-green-600">
+                                    <span>Deposit (Paid)</span> <span class="font-bold">- KES {{ order.deposit|default:"4,000" }}</span>
+                                </li>
+                                <li class="flex justify-between items-center pt-3 mt-2 border-t border-dark-cocoa/10">
+                                    <span class="font-serif italic text-dark-cocoa">Pending Balance</span> 
+                                    <span class="text-xl font-serif font-bold text-gold">KES {{ order.balance|default:"4,000" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Actions Area -->
+                    <form method="POST" action="{% url 'update_order' order.id %}" class="bg-blush/50 p-6 -mx-2 -mb-2 rounded-sm border border-gold/10">
+                        {% csrf_token %}
+                        <h4 class="font-serif italic text-lg text-dark-cocoa mb-4">Finalize & Notify</h4>
+                        
+                        <div class="flex flex-col md:flex-row gap-5 items-end">
+                            <div class="flex-1 w-full">
+                                <label class="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Decoration Cost (KES)</label>
+                                <input type="number" name="decoration_cost" placeholder="0.00" class="w-full input-elegant py-3 px-4 text-dark-cocoa font-bold placeholder-gray-400">
+                            </div>
+                            
+                            <div class="flex-1 w-full">
+                                <label class="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Update Status</label>
+                                <select name="status" class="w-full input-elegant py-3 px-4 text-dark-cocoa bg-transparent">
+                                    <option value="processing">In Oven</option>
+                                    <option value="decorating">Decorating</option>
+                                    <option value="ready">Ready for Pickup</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" name="action" value="send_prompt" class="w-full md:w-auto px-8 py-3 bg-dark-cocoa text-white uppercase text-xs tracking-[0.2em] hover:bg-gold transition-all duration-500 shadow-md hover:shadow-lg">
+                                Send Prompt
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Empty State -->
+            <div class="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
+                <i class="fas fa-cookie-bite text-6xl mb-6 text-gold/30"></i>
+                <p class="font-serif text-xl italic">No active orders found.</p>
+                <p class="text-xs uppercase tracking-widest mt-2">Time to bake something new!</p>
+            </div>
+            {% endfor %}
+
+            <!-- VISUAL PREVIEW DUMMY DATA (Remove in Production) -->
+            <!-- This card mimics how it looks if the loop is empty or for preview purposes -->
+            <div class="admin-card p-0 relative group">
+                <div class="h-1 w-full bg-gold/50"></div>
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6 pb-6 border-b border-dashed border-gray-200">
+                        <div>
+                            <span class="status-badge bg-blush text-dark-cocoa px-3 py-1 rounded-sm">#ORD-9923</span>
+                            <h3 class="text-2xl font-serif text-dark-cocoa mt-3 group-hover:text-gold transition-colors">Black Forest Supreme</h3>
+                            <p class="text-xs uppercase tracking-widest mt-1 text-gray-500"><i class="fas fa-calendar-alt mr-2 text-gold"></i> Due: Tomorrow</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400">Client</p>
+                            <p class="font-serif text-lg text-dark-cocoa">John Doe</p>
+                            <p class="text-xs font-semibold text-gold">+254 712 345 678</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h4 class="text-xs uppercase tracking-[0.2em] font-bold text-gold mb-4">Specifications</h4>
+                            <ul class="space-y-3 text-sm text-gray-600 font-light">
+                                <li class="flex justify-between border-b border-gray-100 pb-1"><span>Flavor</span> <span class="font-medium text-dark-cocoa">Dark Chocolate</span></li>
+                                <li class="flex justify-between border-b border-gray-100 pb-1"><span>Weight</span> <span class="font-medium text-dark-cocoa">2.0 Kg</span></li>
+                                <li class="mt-3 text-xs italic text-gray-500 bg-cream p-3 border-l-2 border-gold">"Write 'Happy Birthday Mum' in Gold Script"</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-xs uppercase tracking-[0.2em] font-bold text-dark-cocoa mb-4">Financials</h4>
+                            <ul class="space-y-3 text-sm text-gray-600 font-light">
+                                <li class="flex justify-between"><span>Base</span> <span>KES 4,500</span></li>
+                                <li class="flex justify-between text-green-600"><span>Paid</span> <span class="font-bold">- KES 2,250</span></li>
+                                <li class="flex justify-between items-center pt-3 mt-2 border-t border-dark-cocoa/10">
+                                    <span class="font-serif italic text-dark-cocoa">Bal</span> <span class="text-xl font-serif font-bold text-gold">KES 2,250</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form class="bg-blush/50 p-6 -mx-2 -mb-2 rounded-sm border border-gold/10">
+                        <h4 class="font-serif italic text-lg text-dark-cocoa mb-4">Finalize & Notify</h4>
+                        <div class="flex flex-col md:flex-row gap-5 items-end">
+                            <div class="flex-1 w-full">
+                                <label class="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Decoration Cost</label>
+                                <input type="number" class="w-full input-elegant py-3 px-4 text-dark-cocoa font-bold" placeholder="KES 0.00">
+                            </div>
+                            <button class="w-full md:w-auto px-8 py-3 bg-dark-cocoa text-white uppercase text-xs tracking-[0.2em] hover:bg-gold transition-all duration-500 shadow-md">
+                                Send Prompt
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+{% endblock %}

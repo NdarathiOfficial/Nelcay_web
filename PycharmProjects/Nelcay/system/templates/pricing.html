@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing & Flavours | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --cream: #FFFDF5;
+            --dark-cocoa: #2C1810;
+            --blush: #F8E8E8;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark-cocoa);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Animations */
+        .animate-reveal {
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.215, 0.61, 0.355, 1);
+            transform: translateY(30px);
+        }
+
+        .animate-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero Styling */
+        .sub-hero {
+            height: 50vh;
+            min-height: 400px;
+            background: linear-gradient(rgba(44, 24, 16, 0.5), rgba(44, 24, 16, 0.5)), 
+                        url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        /* Pricing Table Polish */
+        .price-row {
+            border-bottom: 1px solid rgba(44, 24, 16, 0.05);
+            transition: background-color 0.3s ease;
+        }
+        
+        .price-row:hover {
+            background-color: rgba(212, 175, 55, 0.03);
+        }
+
+        .category-card {
+            background: white;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: transform 0.4s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--gold);
+            transition: width 0.4s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--cream);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        #mobile-menu {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #mobile-menu.hidden-menu {
+            transform: translateX(100%);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="text-center">
+            <p class="serif italic text-xl tracking-widest animate-pulse">Nelcay</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-700 px-6 py-4 lg:px-16 flex justify-between items-center bg-transparent">
+        <a href="{% url 'index' %}" class="text-2xl font-bold tracking-widest serif">
+            NELCAY <span class="text-[9px] font-light block tracking-[0.4em] uppercase opacity-80">Cakey Treats</span>
+        </a>
+        
+        <div class="hidden lg:flex gap-10 items-center uppercase text-[10px] tracking-widest font-semibold">
+            <a href="{% url 'index' %}" class="nav-link">Home</a>
+            <a href="{% url 'about' %}" class="nav-link">Our Story</a>
+            <a href="{% url 'gallery' %}" class="nav-link">Gallery</a>
+            <a href="{% url 'pricing' %}" class="nav-link text-gold">Pricing</a>
+            <a href="{% url 'order' %}" class="nav-link">Order</a>
+            <a href="{% url 'contact' %}" class="px-6 py-2 border border-dark-cocoa/30 hover:bg-dark-cocoa hover:text-white hover:border-dark-cocoa transition-all duration-500">Contact</a>
+        </div>
+
+        <button class="lg:hidden text-2xl p-2" id="toggleOpen">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h16M4 16h16" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] bg-white hidden-menu flex flex-col items-center justify-center lg:hidden">
+        <button id="toggleClose" class="absolute top-6 right-6 text-3xl">&times;</button>
+        <div class="flex flex-col gap-8 text-center uppercase tracking-[0.3em] text-sm">
+            <a href="{% url 'index' %}" class="hover:text-gold">Home</a>
+            <a href="{% url 'about' %}" class="hover:text-gold">Our Story</a>
+            <a href="{% url 'gallery' %}" class="hover:text-gold">Gallery</a>
+            <a href="{% url 'pricing' %}" class="text-gold">Pricing</a>
+            <a href="{% url 'order' %}" class="hover:text-gold">Order</a>
+            <a href="{% url 'contact' %}" class="hover:text-gold">Contact</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="sub-hero">
+        <div class="px-4 animate-reveal active">
+            <p class="uppercase tracking-[0.6em] text-[10px] mb-4 opacity-90">Investment in Taste</p>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl serif italic mb-4">Investment Guide</h1>
+            <div class="w-12 h-px bg-white/50 mx-auto mt-6"></div>
+        </div>
+    </header>
+
+    <!-- Pricing Content -->
+    <section class="py-24 px-6 lg:px-24 bg-white">
+        <div class="max-w-7xl mx-auto">
+            
+            <div class="text-center mb-20 animate-reveal">
+                <h2 class="text-4xl md:text-5xl serif italic mb-6">Our Flavour Collections</h2>
+                <p class="text-gray-500 max-w-2xl mx-auto font-light leading-relaxed">Pricing is quoted per kilogram. All our cakes are handcrafted using premium, organic ingredients sourced locally and internationally.</p>
+            </div>
+
+            <!-- Categories Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                
+                <!-- Category 1: The Classics -->
+                <div class="category-card p-8 md:p-12 animate-reveal">
+                    <h3 class="text-2xl serif mb-8 flex justify-between items-baseline border-b border-gold/20 pb-4">
+                        The Classics 
+                        <span class="text-[10px] uppercase tracking-widest text-gold font-bold">Timeless Favourites</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="price-row flex justify-between py-3"><span>Sponge Cake</span><span class="font-semibold">2,800/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Butter Cake</span><span class="font-semibold">3,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Vanilla</span><span class="font-semibold">2,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Lemon</span><span class="font-semibold">2,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Marble</span><span class="font-semibold">2,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Orange</span><span class="font-semibold">2,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Chocolate</span><span class="font-semibold">3,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Lemon Vanilla</span><span class="font-semibold">2,500/=</span></div>
+                    </div>
+                </div>
+
+                <!-- Category 2: Fruit & Spice -->
+                <div class="category-card p-8 md:p-12 animate-reveal" style="transition-delay: 0.1s">
+                    <h3 class="text-2xl serif mb-8 flex justify-between items-baseline border-b border-gold/20 pb-4">
+                        Fruit & Spice
+                        <span class="text-[10px] uppercase tracking-widest text-gold font-bold">Natural Zest</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="price-row flex justify-between py-3"><span>Banana Cake</span><span class="font-semibold">2,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Pineapple</span><span class="font-semibold">2,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Passion</span><span class="font-semibold">2,600/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Mango</span><span class="font-semibold">2,600/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Coconut Cake</span><span class="font-semibold">2,700/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Strawberry</span><span class="font-semibold">2,900/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Apple Cinnamon</span><span class="font-semibold">3,000/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Blueberry</span><span class="font-semibold">3,000/=</span></div>
+                    </div>
+                </div>
+
+                <!-- Category 3: Indulgent Series -->
+                <div class="category-card p-8 md:p-12 animate-reveal">
+                    <h3 class="text-2xl serif mb-8 flex justify-between items-baseline border-b border-gold/20 pb-4">
+                        Indulgent Series
+                        <span class="text-[10px] uppercase tracking-widest text-gold font-bold">Rich & Decadent</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="price-row flex justify-between py-3"><span>Black Forest</span><span class="font-semibold">2,800/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Red Velvet</span><span class="font-semibold">3,000/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Mocha</span><span class="font-semibold">2,800/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>White Forest</span><span class="font-semibold">3,000/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Oreo</span><span class="font-semibold">3,200/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Chocolate Fudge</span><span class="font-semibold">3,200/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Nutella</span><span class="font-semibold">3,500/=</span></div>
+                    </div>
+                </div>
+
+                <!-- Category 4: Specialty & Nuts -->
+                <div class="category-card p-8 md:p-12 animate-reveal" style="transition-delay: 0.1s">
+                    <h3 class="text-2xl serif mb-8 flex justify-between items-baseline border-b border-gold/20 pb-4">
+                        Specialty & Nuts
+                        <span class="text-[10px] uppercase tracking-widest text-gold font-bold">Artisanal Craft</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="price-row flex justify-between py-3"><span>Spice Cake</span><span class="font-semibold">2,800/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Caramel</span><span class="font-semibold">3,000/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Plain Carrot Cake</span><span class="font-semibold">2,700/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Mixed Fruit Cake</span><span class="font-semibold">3,000/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Nutty Carrot Cake</span><span class="font-semibold">3,000/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Walnut Cake</span><span class="font-semibold">3,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Almond Cake</span><span class="font-semibold">3,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Cheese-Layered Cake</span><span class="font-semibold">3,500/=</span></div>
+                        <div class="price-row flex justify-between py-3"><span>Pecan Praline</span><span class="font-semibold">4,000/=</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Additional Info Section -->
+    <section class="py-24 bg-cream px-6 lg:px-24">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="animate-reveal">
+                <h4 class="text-lg serif italic mb-4">Minimum Order</h4>
+                <p class="text-sm font-light text-gray-500">Our custom cakes start at 1.0kg. For tiered wedding cakes, a minimum of 5kg is recommended to ensure structural elegance.</p>
+            </div>
+            <div class="animate-reveal" style="transition-delay: 0.1s">
+                <h4 class="text-lg serif italic mb-4">Custom Design</h4>
+                <p class="text-sm font-light text-gray-500">Complex designs, edible gold leaf, and handcrafted sugar flowers may incur additional artistry fees depending on the intricacy.</p>
+            </div>
+            <div class="animate-reveal" style="transition-delay: 0.2s">
+                <h4 class="text-lg serif italic mb-4">Tasting Sessions</h4>
+                <p class="text-sm font-light text-gray-500">We offer curated tasting boxes for wedding clients. Inquire via our contact page to schedule a private consultation.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-24 text-center bg-white border-t border-gold/10">
+        <div class="animate-reveal">
+            <h2 class="text-3xl md:text-5xl serif italic mb-6">Found your perfect <span class="text-gold">match?</span></h2>
+            <p class="text-gray-500 mb-10 max-w-xl mx-auto font-light leading-relaxed">Let's start building your celebration masterpiece today.</p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="{% url 'order' %}" class="px-12 py-4 bg-dark-cocoa text-white uppercase text-[10px] tracking-[0.4em] hover:bg-gold transition-all duration-500">Proceed to Order</a>
+                <a href="{% url 'contact' %}" class="px-12 py-4 border border-dark-cocoa uppercase text-[10px] tracking-[0.4em] hover:bg-dark-cocoa hover:text-white transition-all duration-500">Inquire Further</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-cocoa text-white/60 py-20 px-6 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center border-b border-white/5 pb-12 mb-8 text-center md:text-left">
+                <div class="text-3xl serif mb-8 md:mb-0 text-white">
+                    NELCAY <span class="text-gold">.</span>
+                </div>
+                <div class="flex flex-wrap justify-center gap-8 text-[9px] uppercase tracking-[0.3em]">
+                    <a href="{% url 'index' %}" class="hover:text-gold transition-colors">Home</a>
+                    <a href="{% url 'about' %}" class="hover:text-gold transition-colors">Our Story</a>
+                    <a href="{% url 'gallery' %}" class="hover:text-gold transition-colors">Gallery</a>
+                    <a href="{% url 'pricing' %}" class="text-gold">Pricing</a>
+                    <a href="{% url 'order' %}" class="hover:text-gold transition-colors">Order</a>
+                    <a href="{% url 'contact' %}" class="hover:text-gold transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-[8px] uppercase tracking-[0.4em] font-light text-center">
+                <p>© 2024 Nelcay Cakey Treats.</p>
+                <div class="flex gap-10 mt-6 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                    <a href="#" class="hover:text-white transition-colors">Pinterest</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle Mobile Menu
+        const menu = document.getElementById('mobile-menu');
+        document.getElementById('toggleOpen').addEventListener('click', () => menu.classList.remove('hidden-menu'));
+        document.getElementById('toggleClose').addEventListener('click', () => menu.classList.add('hidden-menu'));
+
+        // Smooth Nav Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 80) {
+                nav.classList.add('bg-white', 'py-3', 'shadow-sm');
+                nav.classList.remove('bg-transparent', 'py-4');
+                nav.style.color = 'var(--dark-cocoa)';
+            } else {
+                nav.classList.remove('bg-white', 'py-3', 'shadow-sm');
+                nav.classList.add('bg-transparent', 'py-4');
+                nav.style.color = 'white';
+            }
+        });
+        document.getElementById('navbar').style.color = 'white';
+
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-reveal').forEach(el => observer.observe(el));
+
+        // Loader
+        window.onload = () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 800);
+        };
+    </script>
+</body>
+</html>

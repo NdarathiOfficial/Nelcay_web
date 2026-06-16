@@ -1,0 +1,316 @@
+{% load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --cream: #FFFDF5;
+            --dark-cocoa: #2C1810;
+            --blush: #F8E8E8;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark-cocoa);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .animate-reveal {
+            opacity: 0;
+            transition: all 1s ease-out;
+            transform: translateY(40px);
+        }
+
+        .animate-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Sub-page Styling */
+        .sub-hero {
+            height: 60vh;
+            background: linear-gradient(rgba(44, 24, 16, 0.4), rgba(44, 24, 16, 0.4)),
+                        url('https://images.unsplash.com/photo-1488477181946-6428a0291777?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--cream);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--blush);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="serif italic text-xl">Loading Our Story...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 px-6 py-4 lg:px-16 flex justify-between items-center bg-transparent">
+        <a href="index.html" class="text-2xl font-bold tracking-widest serif">
+            NELCAY <span class="text-sm font-light block tracking-[0.3em] uppercase">Cakey Treats</span>
+        </a>
+
+        <div class="hidden lg:flex gap-8 items-center uppercase text-[10px] tracking-widest font-semibold">
+            <a href="{% url 'index' %}" class="nav-link">Home</a>
+            <a href="{% url 'about' %}" class="nav-link text-gold">Our Story</a>
+            <a href="{% url 'gallery' %}" class="nav-link">Gallery</a>
+            <a href="{% url 'pricing' %}" class="nav-link">Pricing</a>
+            <a href="{% url 'order' %}" class="nav-link">Order</a>
+            <a href="{% url 'contact' %}" class="px-5 py-2 border border-dark-cocoa hover:bg-dark-cocoa hover:text-white transition-all duration-300">Contact</a>
+        </div>
+
+        <button class="lg:hidden text-2xl" id="menuBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h16M4 16h16" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Sub-Hero Section -->
+    <header class="sub-hero">
+        <div class="px-4">
+            <p class="uppercase tracking-[0.5em] text-xs mb-4">The Heart of the Bakery</p>
+            <h1 class="text-5xl md:text-7xl serif italic">Our Story</h1>
+        </div>
+    </header>
+
+    <!-- The Founder Section -->
+    <section class="py-24 px-6 lg:px-24 bg-white">
+        <div class="grid md:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+            <div class="relative animate-reveal">
+                <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Caroline Wambui Ngure" class="w-full h-[600px] object-cover rounded-sm shadow-2xl">
+                <div class="absolute -bottom-8 -right-8 bg-cream p-8 hidden lg:block border border-gold/20">
+                    <p class="serif italic text-2xl">Caroline Wambui Ngure</p>
+                    <p class="uppercase tracking-widest text-[10px] mt-2 font-bold text-gold">Founder & Head Baker</p>
+                </div>
+            </div>
+
+            <div class="animate-reveal" style="transition-delay: 0.2s">
+                <p class="text-gold uppercase tracking-[0.3em] text-xs mb-4 font-bold">Meet the Maker</p>
+                <h2 class="text-4xl md:text-5xl mb-8 serif leading-tight">Crafting Memories <br> <span class="italic text-gold">One Cake at a Time</span></h2>
+                <div class="space-y-6 text-gray-600 font-light leading-relaxed">
+                    <p>
+                        The journey of Nelcay Cakey Treats began in 2018 with a simple belief held by our founder, <span class="font-semibold text-dark-cocoa">Caroline Wambui Ngure</span>: that life’s most beautiful moments deserve a centerpiece that is as exquisite as the memory itself.
+                    </p>
+                    <p>
+                        With a background rooted in the art of traditional baking and a contemporary eye for design, Caroline transformed her passion into a sanctuary of sweetness. For her, baking is not merely a process—it is a language of love, celebration, and meticulous artistry.
+                    </p>
+                    <p>
+                        Every recipe developed at Nelcay is a testament to Caroline's dedication to perfection. From the precise fold of the batter to the delicate placement of a hand-sculpted sugar petal, her touch is present in every creation that leaves our studio.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values / Philosophy Section -->
+    <section class="py-24 bg-cream overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-24">
+            <div class="text-center mb-16 animate-reveal">
+                <h2 class="text-4xl serif mb-4 italic">The Nelcay Promise</h2>
+                <div class="w-20 h-px bg-gold mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="text-center p-8 animate-reveal" style="transition-delay: 0.1s">
+                    <div class="mb-6 flex justify-center text-gold">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl serif mb-4">Unrivaled Quality</h3>
+                    <p class="text-sm font-light text-gray-500 leading-relaxed">We source only premium ingredients, from organic fruits to the finest cocoa, ensuring every bite is a revelation of flavour.</p>
+                </div>
+
+                <div class="text-center p-8 animate-reveal" style="transition-delay: 0.2s">
+                    <div class="mb-6 flex justify-center text-gold">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"></path>
+                            <path d="M12 8V12L15 15"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl serif mb-4">Timeless Artistry</h3>
+                    <p class="text-sm font-light text-gray-500 leading-relaxed">Our designs balance classic elegance with modern flair, creating cakes that are visual masterpieces for your special day.</p>
+                </div>
+
+                <div class="text-center p-8 animate-reveal" style="transition-delay: 0.3s">
+                    <div class="mb-6 flex justify-center text-gold">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l8.94-8.94 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl serif mb-4">Made with Heart</h3>
+                    <p class="text-sm font-light text-gray-500 leading-relaxed">Beyond the flour and sugar, our primary ingredient is passion. We care about your celebration as much as you do.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline / Milestones -->
+    <section class="py-24 px-6 lg:px-24 bg-white">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl serif text-center mb-16 italic">Our Journey</h2>
+
+            <div class="space-y-16 relative">
+                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200 hidden md:block"></div>
+
+                <!-- 2018 -->
+                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start animate-reveal">
+                    <div class="md:w-1/2 md:text-right">
+                        <span class="text-gold serif text-3xl font-bold">2018</span>
+                        <h4 class="text-xl mb-2">The First Spark</h4>
+                        <p class="text-sm text-gray-500 font-light">Caroline founds Nelcay Cakey Treats, operating from a boutique kitchen with a focus on bespoke birthday confections.</p>
+                    </div>
+                    <div class="hidden md:block w-4 h-4 rounded-full bg-gold border-4 border-white shadow-sm z-10 mt-2"></div>
+                    <div class="md:w-1/2"></div>
+                </div>
+
+                <!-- 2020 -->
+                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start animate-reveal">
+                    <div class="md:w-1/2"></div>
+                    <div class="hidden md:block w-4 h-4 rounded-full bg-gold border-4 border-white shadow-sm z-10 mt-2"></div>
+                    <div class="md:w-1/2 md:text-left">
+                        <span class="text-gold serif text-3xl font-bold">2020</span>
+                        <h4 class="text-xl mb-2">Signature Style</h4>
+                        <p class="text-sm text-gray-500 font-light">The bakery gains recognition for its signature "Floral Series," merging botanical beauty with gourmet flavours.</p>
+                    </div>
+                </div>
+
+                <!-- Present -->
+                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start animate-reveal">
+                    <div class="md:w-1/2 md:text-right">
+                        <span class="text-gold serif text-3xl font-bold">Today</span>
+                        <h4 class="text-xl mb-2">A Legacy in the Making</h4>
+                        <p class="text-sm text-gray-500 font-light">Now a leading name in luxury event catering, Caroline and her team continue to redefine the boundaries of confectionery art.</p>
+                    </div>
+                    <div class="hidden md:block w-4 h-4 rounded-full bg-gold border-4 border-white shadow-sm z-10 mt-2"></div>
+                    <div class="md:w-1/2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-cocoa text-white/80 py-16 px-6 lg:px-24">
+        <div class="flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-12 mb-8">
+            <div class="text-3xl serif mb-8 md:mb-0">
+                NELCAY <span class="text-gold">.</span>
+            </div>
+            <div class="flex flex-wrap justify-center gap-8 text-[10px] uppercase tracking-widest font-medium">
+                <a href="{% url 'index' %}" class="hover:text-gold transition-colors">Home</a>
+                <a href="{% url 'about' %}" class="hover:text-gold transition-colors">Our Story</a>
+                <a href="{% url 'gallery' %}" class="hover:text-gold transition-colors">Gallery</a>
+                <a href="{% url 'pricing' %}" class="hover:text-gold transition-colors">Pricing</a>
+                <a href="{% url 'order' %}" class="hover:text-gold transition-colors">Order</a>
+                <a href="{% url 'contact' %}" class="hover:text-gold transition-colors">Contact</a>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center text-[10px] uppercase tracking-widest">
+            <p>© 2024 Nelcay Cakey Treats. All rights reserved.</p>
+            <div class="flex gap-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-gold">Instagram</a>
+                <a href="#" class="hover:text-gold">Pinterest</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-white', 'shadow-md', 'py-2');
+                nav.classList.remove('bg-transparent', 'py-4');
+                nav.style.color = 'var(--dark-cocoa)';
+            } else {
+                nav.classList.remove('bg-white', 'shadow-md', 'py-2');
+                nav.classList.add('bg-transparent', 'py-4');
+                nav.style.color = 'white'; // Keep white on sub-hero unless scrolled
+            }
+        });
+
+        // Initialize nav color for sub-pages (starts white because of hero)
+        document.getElementById('navbar').style.color = 'white';
+
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-reveal').forEach(el => observer.observe(el));
+
+        window.onload = () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 800);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place an Order | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --gold: #D4AF37; --cream: #FFFDF5; --dark-cocoa: #2C1810; --gold-light: #e5c55d; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--cream); color: var(--dark-cocoa); overflow-x: hidden; }
+        .serif { font-family: 'Playfair Display', serif; }
+
+        /* Animations */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-entry { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+
+        /* Floating Label Logic */
+        .form-group { position: relative; margin-bottom: 2.5rem; }
+
+        .form-group select, .form-group input, .form-group textarea {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(44, 24, 16, 0.2);
+            padding: 12px 0; font-size: 1rem; color: var(--dark-cocoa); outline: none; transition: all 0.3s ease;
+            border-radius: 0; appearance: none; z-index: 10; position: relative;
+        }
+
+        /* Fixed Label Position (Always Floating) to avoid overlap with placeholders */
+        .form-group label {
+            position: absolute;
+            top: -15px;
+            left: 0;
+            font-size: 0.65rem;
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        /* Focus States */
+        .form-group select:focus, .form-group input:focus, .form-group textarea:focus {
+            border-bottom-color: var(--gold); padding-left: 5px;
+        }
+
+        /* Custom Select Arrow */
+        .select-wrapper { position: relative; }
+        .select-arrow { position: absolute; right: 0; top: 15px; pointer-events: none; color: var(--gold); z-index: 5; }
+
+        .sub-hero {
+            height: 50vh; background: linear-gradient(to bottom, rgba(44, 24, 16, 0.4), rgba(44, 24, 16, 0.8)), url('https://images.unsplash.com/photo-1621303837174-89787a7d4729?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; text-align: center; color: white;
+            background-attachment: fixed;
+        }
+
+        /* Receipt Style Card */
+        .receipt-card {
+            background: #fff;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            position: relative;
+            box-shadow: 0 10px 30px -10px rgba(44, 24, 16, 0.1);
+        }
+        .receipt-card::before {
+            content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 3px;
+            background: repeating-linear-gradient(90deg, var(--gold), var(--gold) 10px, transparent 10px, transparent 20px);
+        }
+
+        /* Button Gradient */
+        .btn-gold {
+            background-image: linear-gradient(to right, var(--dark-cocoa) 0%, #4a2c20 51%, var(--dark-cocoa) 100%);
+            background-size: 200% auto; transition: 0.5s;
+        }
+        .btn-gold:hover {
+            background-position: right center; background-image: linear-gradient(to right, var(--gold) 0%, var(--gold-light) 51%, var(--gold) 100%);
+            color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        #protected-content { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div id="loader" class="fixed inset-0 bg-cream flex items-center justify-center z-[100]">
+        <div class="text-center">
+            <p class="serif italic text-2xl tracking-widest animate-pulse text-dark-cocoa mb-2">Nelcay</p>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-gold">Authenticating</p>
+        </div>
+    </div>
+
+    <!-- Protected Content Wrapper -->
+    <div id="protected-content">
+        <nav class="absolute w-full z-50 px-6 py-8 flex justify-between items-center text-white transition-all duration-300">
+            <a href="{% url 'index' %}" class="text-3xl font-bold tracking-widest serif hover:text-gold transition-colors">NELCAY<span class="text-gold">.</span></a>
+            <div class="flex gap-8 items-center">
+                <a href="{% url 'profile' %}" class="group flex items-center gap-2 text-white hover:text-gold transition-colors">
+                    <div class="w-8 h-8 rounded-full border border-white/50 group-hover:border-gold flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    </div>
+                    <span class="hidden md:inline text-[10px] uppercase tracking-widest" id="user-display">Guest</span>
+                </a>
+                <button id="logoutBtn" class="text-[10px] uppercase tracking-[0.2em] border border-white/30 px-6 py-3 hover:bg-gold hover:border-gold hover:text-white transition-all bg-transparent cursor-pointer text-white">
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <header class="sub-hero">
+            <div class="px-4 animate-entry">
+                <p class="uppercase tracking-[0.4em] text-[10px] mb-4 text-gold font-bold">Curate Your Experience</p>
+                <h1 class="text-5xl md:text-7xl serif italic mb-2 leading-tight">Design Your Cake</h1>
+                <div class="w-16 h-1 bg-gold mx-auto mt-6"></div>
+            </div>
+        </header>
+
+        <section class="py-24 px-6 relative z-10 -mt-24">
+            <!-- Changed flex-col md:flex-row to flex-col lg:flex-row to prevent squeezing on tablets -->
+            <div class="max-w-6xl mx-auto bg-white shadow-2xl border-t-8 border-gold animate-entry flex flex-col lg:flex-row overflow-hidden" style="animation-delay: 0.2s;">
+
+                <!-- Left Column: Form -->
+                <div class="w-full lg:w-2/3 p-10 md:p-16">
+                    <div class="mb-10">
+                        <h2 class="text-3xl serif text-dark-cocoa mb-2">Order Details</h2>
+                        <p class="text-xs text-gray-400 font-light">Customize your flavour and size preferences.</p>
+                    </div>
+
+                    {% if messages %}
+                    <div class="mb-8">
+                        {% for message in messages %}
+                        <div class="p-4 text-[10px] uppercase tracking-widest text-center border-l-4 shadow-sm {% if message.tags == 'success' %}border-green-500 bg-green-50 text-green-700{% else %}border-red-500 bg-red-50 text-red-700{% endif %}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form action="" method="POST" id="orderForm" autocomplete="off">
+                        {% csrf_token %}
+
+                        <!-- Hidden Fields -->
+                        {{ form.customer_name }}
+                        {{ form.customer_email }}
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
+                            <!-- Flavour Select -->
+                            <div class="form-group select-wrapper">
+                                {{ form.flavour }}
+                                <label>Select Flavour</label>
+                                <div class="select-arrow">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </div>
+                            </div>
+
+                            <!-- Weight Input -->
+                            <div class="form-group">
+                                {{ form.weight }}
+                                <label>Weight (KG)</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.date_needed }}
+                            <label>Date Required</label>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.cake_message }}
+                            <label>Inscription (Optional)</label>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.details }}
+                            <label>Special Details / Allergies</label>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column: Summary & Payment -->
+                <div class="w-full lg:w-1/3 bg-[#fcf9f2] p-10 md:p-12 flex flex-col justify-between border-l border-gray-100">
+                    <div>
+                        <h3 class="text-xl serif italic text-dark-cocoa mb-8">Estimated Costs</h3>
+
+                        <div class="receipt-card p-6 mb-8">
+                            <div class="flex justify-between items-center mb-4 pb-4 border-b border-dashed border-gray-200 flex-wrap gap-2">
+                                <span class="text-[10px] uppercase tracking-widest text-gray-500">Rate / KG</span>
+                                <span id="rateDisplay" class="text-xs font-bold text-dark-cocoa whitespace-nowrap">-</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+                                <span class="text-[10px] uppercase tracking-widest text-gray-500">Total Price</span>
+                                <span id="totalDisplay" class="text-lg font-medium text-gray-700 whitespace-nowrap">Ksh 0.00</span>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <span class="text-[10px] uppercase tracking-widest text-gold font-bold block mb-1">Deposit Due (50%)</span>
+                                <span id="depositDisplay" class="text-2xl md:text-3xl serif font-bold text-dark-cocoa break-words">Ksh 0.00</span>
+                            </div>
+                        </div>
+
+                        <p class="text-[10px] text-gray-400 italic leading-relaxed">
+                            * Pricing is an estimate based on flavour and weight. Custom designs may incur additional fees discussed during confirmation.
+                        </p>
+                    </div>
+
+                    <button type="submit" form="orderForm" id="submitBtn" class="w-full btn-gold text-white py-5 px-6 uppercase text-[10px] tracking-[0.25em] font-bold shadow-xl mt-8 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500">
+                        Proceed to Pay Deposit
+                    </button>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- Pass Prices from Django View to JS -->
+    {{ flavour_prices|json_script:"flavour-prices-data" }}
+
+    <script>
+        // --- 1. FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4GMFz5_naMtMHlqO0SepO-NnLptLHV2M",
+            authDomain: "nelcay-web.firebaseapp.com",
+            databaseURL: "https://nelcay-web-default-rtdb.firebaseio.com",
+            projectId: "nelcay-web",
+            storageBucket: "nelcay-web.firebasestorage.app",
+            messagingSenderId: "815189958408",
+            appId: "1:815189958408:web:82f45f1a1f8acc732b56bd",
+            measurementId: "G-X4JDRWDEDE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // --- 2. AUTHENTICATION CHECK ---
+        auth.onAuthStateChanged((user) => {
+            const loader = document.getElementById('loader');
+            const content = document.getElementById('protected-content');
+
+            if (user) {
+                loader.style.display = 'none';
+                content.style.display = 'block';
+
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-display').textContent = name;
+
+                // Fill hidden Django form fields
+                if(document.querySelector('input[name="customer_name"]'))
+                    document.querySelector('input[name="customer_name"]').value = name;
+                if(document.querySelector('input[name="customer_email"]'))
+                    document.querySelector('input[name="customer_email"]').value = user.email;
+
+            } else {
+                window.location.href = "{% url 'login' %}";
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = "{% url 'login' %}";
+            });
+        });
+
+        // --- 3. DYNAMIC PRICE CALCULATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const flavourSelect = document.querySelector('select[name="flavour"]');
+            const weightInput = document.querySelector('input[name="weight"]');
+
+            const rateDisplay = document.getElementById('rateDisplay');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const depositDisplay = document.getElementById('depositDisplay');
+            const submitBtn = document.getElementById('submitBtn');
+
+            const prices = JSON.parse(document.getElementById('flavour-prices-data').textContent);
+
+            function updatePrice() {
+                const selectedFlavour = flavourSelect.value;
+                const weight = parseFloat(weightInput.value);
+
+                if (selectedFlavour && weight && weight > 0 && prices[selectedFlavour]) {
+                    const pricePerKg = prices[selectedFlavour];
+                    const total = pricePerKg * weight;
+                    const deposit = total * 0.5;
+
+                    rateDisplay.textContent = `Ksh ${pricePerKg.toLocaleString()}`;
+                    totalDisplay.textContent = `Ksh ${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    depositDisplay.textContent = `Ksh ${deposit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                    submitBtn.textContent = `Pay Deposit: Ksh ${deposit.toLocaleString()}`;
+                    submitBtn.disabled = false;
+                } else {
+                    rateDisplay.textContent = "-";
+                    totalDisplay.textContent = "Ksh 0.00";
+                    depositDisplay.textContent = "Ksh 0.00";
+                    submitBtn.textContent = "Proceed to Pay Deposit";
+                    submitBtn.disabled = true; // Disable if incomplete
+                }
+            }
+
+            if (flavourSelect && weightInput) {
+                // Initialize state
+                updatePrice();
+
+                flavourSelect.addEventListener('change', updatePrice);
+                weightInput.addEventListener('input', updatePrice);
+            }
+        });
+    </script>
+</body>
+</html>

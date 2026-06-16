@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --gold: #D4AF37; --cream: #FFFDF5; --dark-cocoa: #2C1810; --gold-light: #e5c55d; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--cream); color: var(--dark-cocoa); overflow-x: hidden; }
+        .serif { font-family: 'Playfair Display', serif; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-entry { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+
+        .sub-hero {
+            height: 45vh;
+            background: linear-gradient(to bottom, rgba(44, 24, 16, 0.6), rgba(44, 24, 16, 0.9)),
+                        url('https://images.unsplash.com/photo-1559553156-2e97137af16f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            position: relative;
+        }
+
+        .profile-card {
+            background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            position: relative; border-top: 6px solid var(--gold);
+        }
+
+        .avatar-ring {
+            width: 160px; height: 160px; border-radius: 50%; padding: 5px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--dark-cocoa));
+            margin: -80px auto 25px; position: relative; z-index: 10;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .avatar-img {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 5px solid white;
+            background-color: #f3f3f3;
+        }
+
+        .info-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.25em; color: #999; margin-bottom: 6px; display: block; }
+        .info-value {
+            font-size: 1.1rem; color: var(--dark-cocoa); font-weight: 500; font-family: 'Playfair Display', serif;
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.3); padding-bottom: 12px;
+        }
+
+        .btn-gold-outline {
+            border: 1px solid var(--gold); color: var(--gold); padding: 12px 30px;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; font-weight: bold;
+            transition: all 0.4s ease; position: relative; overflow: hidden;
+        }
+        .btn-gold-outline::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 0; height: 100%;
+            background: var(--gold); transition: width 0.4s ease; z-index: -1;
+        }
+        .btn-gold-outline:hover::before { width: 100%; }
+        .btn-gold-outline:hover { color: white; }
+
+        /* Disabled State */
+        .btn-disabled {
+            border-color: #ccc; color: #ccc; pointer-events: none;
+        }
+
+        #protected-content { display: none; }
+    </style>
+</head>
+<body class="bg-[#fcf9f2]">
+
+    <div id="loader" class="fixed inset-0 bg-cream flex items-center justify-center z-[100]">
+        <div class="text-center">
+            <p class="serif italic text-3xl tracking-widest animate-pulse text-dark-cocoa mb-3">Nelcay</p>
+            <p class="text-[9px] uppercase tracking-[0.4em] text-gold">Loading Profile</p>
+        </div>
+    </div>
+
+    <div id="protected-content">
+        <nav class="absolute w-full z-50 px-6 py-8 flex justify-between items-center text-white/90">
+            <a href="{% url 'index' %}" class="text-2xl font-bold tracking-widest serif hover:text-gold transition-colors">NELCAY</a>
+            <div class="flex gap-8 items-center">
+                <button id="logoutBtn" class="text-[10px] uppercase tracking-[0.2em] border border-white/30 px-5 py-2 hover:bg-gold hover:border-gold transition-all bg-transparent cursor-pointer text-white">Logout</button>
+            </div>
+        </nav>
+
+        <header class="sub-hero flex flex-col items-center justify-center text-center">
+            <div class="px-4 animate-entry">
+                <p class="uppercase tracking-[0.4em] text-[10px] mb-3 text-gold">Loyalty Member</p>
+                <h1 class="text-5xl md:text-7xl serif italic text-white">My Profile</h1>
+            </div>
+        </header>
+
+        <section class="pb-24 px-6 relative z-10 -mt-24">
+            <div class="max-w-4xl mx-auto profile-card animate-entry rounded-sm" style="animation-delay: 0.2s;">
+
+                <div class="avatar-ring">
+                    <img id="profilePic" src="https://via.placeholder.com/150?text=NC" alt="Profile" class="avatar-img shadow-lg">
+                </div>
+
+                <div class="text-center mb-14 px-6">
+                    <h2 id="displayName" class="text-3xl md:text-4xl serif text-dark-cocoa mb-3">Loading...</h2>
+                    <p id="displayEmail" class="text-[10px] text-gray-400 font-medium tracking-[0.2em] uppercase">Loading...</p>
+                    <div class="w-12 h-1 bg-gold mx-auto my-6"></div>
+                    <p id="displayBio" class="text-sm text-gray-500 font-light italic max-w-lg mx-auto leading-relaxed">"Loading bio..."</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 px-10 md:px-24 pb-20">
+                    <div>
+                        <span class="info-label">Phone Number</span>
+                        <div id="displayPhone" class="info-value">-</div>
+                    </div>
+                    <div>
+                        <span class="info-label">Residence / Location</span>
+                        <div id="displayLocation" class="info-value">-</div>
+                    </div>
+                    <div>
+                        <span class="info-label">Favorite Flavor</span>
+                        <div id="displayFlavor" class="info-value">-</div>
+                    </div>
+                    <div>
+                        <span class="info-label">Member Since</span>
+                        <div id="displayJoined" class="info-value">-</div>
+                    </div>
+                </div>
+
+                <div class="bg-[#fafafa] p-10 text-center border-t border-gray-100 flex flex-col md:flex-row justify-center gap-6 items-center">
+                    <a href="{% url 'edit' %}" class="btn-gold-outline inline-block cursor-pointer bg-white z-10">
+                        Edit Profile
+                    </a>
+
+                    <!-- Order Button: Disabled if profile incomplete -->
+                    <a href="{% url 'order' %}" id="orderBtn" class="btn-disabled text-[10px] uppercase tracking-[0.2em] transition-colors flex flex-col items-center">
+                        Place New Order →
+                        <span id="orderBtnSubtext" class="text-[9px] text-red-400 mt-1 opacity-0 transition-opacity">Complete profile first</span>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4GMFz5_naMtMHlqO0SepO-NnLptLHV2M",
+            authDomain: "nelcay-web.firebaseapp.com",
+            databaseURL: "https://nelcay-web-default-rtdb.firebaseio.com",
+            projectId: "nelcay-web",
+            storageBucket: "nelcay-web.firebasestorage.app",
+            messagingSenderId: "815189958408",
+            appId: "1:815189958408:web:82f45f1a1f8acc732b56bd",
+            measurementId: "G-X4JDRWDEDE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const uid = user.uid;
+                const userRef = database.ref('users/' + uid);
+
+                userRef.once('value').then((snapshot) => {
+                    const data = snapshot.val() || {};
+
+                    // Populate UI
+                    document.getElementById('displayName').textContent = data.username || user.displayName || "Valued Member";
+                    document.getElementById('displayEmail').textContent = user.email;
+                    document.getElementById('displayBio').textContent = data.bio ? `"${data.bio}"` : "No bio added yet.";
+                    document.getElementById('displayPhone').textContent = data.phone || "Not set";
+                    document.getElementById('displayLocation').textContent = data.location || "Not set";
+                    document.getElementById('displayFlavor').textContent = data.favorite_flavor || "Not set";
+
+                    const date = new Date(user.metadata.creationTime);
+                    document.getElementById('displayJoined').textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                    if(data.profile_pic_url) {
+                        document.getElementById('profilePic').src = data.profile_pic_url;
+                    }
+
+                    // Check Profile Completion for Order Button
+                    const orderBtn = document.getElementById('orderBtn');
+                    const orderSub = document.getElementById('orderBtnSubtext');
+
+                    if (data.phone && data.location) {
+                        // Profile valid: Enable Order
+                        orderBtn.classList.remove('btn-disabled');
+                        orderBtn.classList.add('text-gray-400', 'hover:text-gold');
+                    } else {
+                        // Profile incomplete: Keep disabled & show message
+                        orderSub.style.opacity = '1';
+                    }
+
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('protected-content').style.display = 'block';
+                });
+
+            } else {
+                window.location.href = "{% url 'login' %}";
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut().then(() => window.location.href = "{% url 'login' %}");
+        });
+    </script>
+</body>
+</html>

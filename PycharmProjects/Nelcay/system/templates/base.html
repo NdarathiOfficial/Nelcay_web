@@ -1,0 +1,59 @@
+{% load static %}
+<h1 style="color: #4ac1f7; font-size: 40px; align-content: center; justify-content: center;align-items: center; font-weight: bold">Welcome to Nelcay Cakey Treats Website</h1>
+<div class="slideshow">
+  <div class="slide"><img src="{% static 'assets/images/logo.png' %}"><div class="caption"></div></div>
+  <div class="slide"><img src="{% static 'assets/images/slideshow1.jpg' %}"><div class="caption"></div></div>
+  <div class="slide"><img src="{% static 'assets/images/slideshow2.jpg' %}"><div class="caption"></div></div>
+  <div class="slide"><img src="{% static 'assets/images/slideshow3.jpg' %}"><div class="caption"></div></div>
+  <div class="slide"><img src="{% static 'assets/images/slideshow4.jpg' %}"><div class="caption"></div></div>
+  <div class="slide"><img src="{% static 'assets/images/slideshow5.jpg' %}"><div class="caption"></div></div>
+
+
+</div>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}{% endblock%}</title>
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+    
+<div class="content"></div>
+</head>
+<body class="background">
+<div class="watermark">
+
+<nav style="background-color: #20c997; top: 0; ">
+
+    <ul>
+        <li><a href="{% url 'index' %}">Home</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'contact' %}">Contact Us</a></li>
+        <li><a href="{% url 'order' %}">Order Now</a></li>
+        <li><a href="{% url 'gallery' %}">Gallery</a></li>
+        <li><a href="{% url 'pricing' %}">Pricing</a></li>
+        <li><a href="{% url 'mpesaapi' %}">Payment</a></li>
+
+    </ul>
+</nav>
+
+
+<script>
+  let index = 0;
+  const slides = document.querySelectorAll(".slide");
+
+  function showSlide() {
+    slides.forEach(s => s.style.display = "none");
+    slides[index].style.display = "block";
+    index = (index + 1) % slides.length;
+  }
+
+  showSlide();
+  setInterval(showSlide, 3000)  ;
+</script>
+
+{% block content %}
+
+{% endblock %}
+</div>
+</div>
+</body>

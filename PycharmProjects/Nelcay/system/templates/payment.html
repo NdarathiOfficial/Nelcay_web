@@ -1,0 +1,171 @@
+{% load static %}
+
+{% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+            <div class="p-4 rounded-md text-sm font-medium
+                {% if message.tags == 'error' %}
+                    bg-red-100 text-red-700 border border-red-400
+                {% else %}
+                    bg-green-100 text-green-700 border border-green-400
+                {% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment | Nelcay Cakey Treats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --gold: #D4AF37; --cream: #FFFDF5; --dark-cocoa: #2C1810; --gold-light: #e5c55d; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--cream); color: var(--dark-cocoa); overflow-x: hidden; }
+        .serif { font-family: 'Playfair Display', serif; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-entry { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+
+        .form-group { position: relative; margin-bottom: 2.5rem; }
+        .form-group input { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(44, 24, 16, 0.2); padding: 12px 0; font-size: 1rem; color: var(--dark-cocoa); outline: none; transition: all 0.3s ease; border-radius: 0; }
+        .form-group input[readonly] { color: #555; font-weight: 500; border-bottom: 1px solid rgba(212, 175, 55, 0.3); cursor: default; }
+        .form-group label { position: absolute; top: -15px; left: 0; font-size: 0.65rem; color: var(--gold); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; pointer-events: none; transition: all 0.3s ease; }
+        .form-group input:focus { border-bottom-color: var(--gold); }
+        .form-group input:focus ~ label { color: var(--dark-cocoa); }
+
+        .mpesa-badge { background: #4CAF50; color: white; padding: 6px 16px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: bold; border-radius: 2px; box-shadow: 0 4px 6px -1px rgba(76, 175, 80, 0.2); }
+        .btn-gold { background-image: linear-gradient(to right, var(--dark-cocoa) 0%, #4a2c20 51%, var(--dark-cocoa) 100%); background-size: 200% auto; transition: 0.5s; }
+        .btn-gold:hover { background-position: right center; background-image: linear-gradient(to right, var(--gold) 0%, var(--gold-light) 51%, var(--gold) 100%); color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        .gold-border-top { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold)); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative bg-[#fcf9f2]">
+
+    <nav class="absolute w-full z-50 px-6 py-8 flex justify-between items-center text-dark-cocoa">
+        <a href="{% url 'index' %}" class="text-3xl font-bold tracking-widest serif hover:text-gold transition-colors">NELCAY<span class="text-gold">.</span></a>
+        <a href="{% url 'order' %}" class="text-[10px] uppercase tracking-[0.2em] group flex items-center gap-2 hover:text-gold transition-all cursor-pointer">
+            <span class="group-hover:-translate-x-1 transition-transform">←</span> Back to Order
+        </a>
+    </nav>
+
+    <div class="flex-grow flex items-center justify-center p-6 relative z-10">
+
+        <div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-0 shadow-2xl rounded-sm overflow-hidden animate-entry">
+
+            <!-- Left Side: Order Summary -->
+            <div class="bg-white p-10 md:p-12 border-r border-gray-100 flex flex-col relative">
+                <div class="gold-border-top"></div>
+
+                <div class="mb-8">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-gray-400 mb-2">Order Reference</p>
+                    <h2 class="text-3xl serif italic text-dark-cocoa">Summary</h2>
+                </div>
+
+                <div class="space-y-6 flex-grow">
+                    <div class="flex justify-between items-baseline border-b border-dashed border-gray-200 pb-4">
+                        <span class="text-xs uppercase tracking-wider text-gray-500 font-medium">Flavor</span>
+                        <!-- Displaying pre-stored string from session -->
+                        <span class="font-serif text-lg text-dark-cocoa">{{ order.flavor }}</span>
+                    </div>
+                    <div class="flex justify-between items-baseline border-b border-dashed border-gray-200 pb-4">
+                        <span class="text-xs uppercase tracking-wider text-gray-500 font-medium">Weight</span>
+                        <span class="font-serif text-lg text-dark-cocoa">{{ order.weight }} Kg</span>
+                    </div>
+                    <div class="flex justify-between items-baseline border-b border-dashed border-gray-200 pb-4">
+                        <span class="text-xs uppercase tracking-wider text-gray-500 font-medium">Total Value</span>
+                        <span class="font-serif text-lg text-dark-cocoa">Ksh {{ order.total_price }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 bg-cream -mx-10 -mb-12 px-10 pb-12 border-t border-gold/10">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-gold font-bold">Deposit Due</span>
+                        <span class="text-3xl serif font-bold text-dark-cocoa">Ksh {{ order.deposit_amount }}</span>
+                    </div>
+                    <p class="text-[9px] text-gray-400 mt-2 italic">* Balance due upon delivery</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Payment Form -->
+            <div class="bg-[#fafafa] p-10 md:p-12 flex flex-col justify-center relative">
+                <div class="text-center mb-10">
+                    <div class="mb-6 flex justify-center"><span class="mpesa-badge">M-Pesa Secure</span></div>
+                    <h3 class="text-xl serif text-dark-cocoa mb-2">Payment Details</h3>
+                    <p class="text-xs text-gray-400 font-light max-w-xs mx-auto">Confirm your M-Pesa number to receive the payment prompt.</p>
+                </div>
+
+                <form method="POST" action="{% url 'mpesaapi' %}" onsubmit="return confirm('Initiate M-Pesa STK Push?');">
+                    {% csrf_token %}
+                    <!-- Passing amount to mpesaapi -->
+                    <input type="hidden" name="amount" value="{{ order.deposit_amount }}">
+
+                    <!-- Visual Amount (Readonly) -->
+                    <div class="form-group mb-8">
+                        <input type="text" value="Ksh {{ order.deposit_amount }}" readonly class="font-serif italic text-xl">
+                        <label>Amount to Pay</label>
+                        <div class="absolute right-0 top-2 text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg></div>
+                    </div>
+
+                    <!-- Phone Number Field (Autofilled by JS) -->
+                    <div class="form-group">
+                        <input type="text" name="phonenumber" id="phonenumber" placeholder=" " required class="tracking-widest">
+                        <label for="phonenumber">Phone Number</label>
+                    </div>
+
+                    <button type="submit" class="w-full btn-gold text-white py-5 uppercase text-[10px] tracking-[0.25em] font-bold shadow-xl mt-8 flex justify-center items-center gap-3 group">
+                        <span>Initiate Payment</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4GMFz5_naMtMHlqO0SepO-NnLptLHV2M",
+            authDomain: "nelcay-web.firebaseapp.com",
+            databaseURL: "https://nelcay-web-default-rtdb.firebaseio.com",
+            projectId: "nelcay-web",
+            storageBucket: "nelcay-web.firebasestorage.app",
+            messagingSenderId: "815189958408",
+            appId: "1:815189958408:web:82f45f1a1f8acc732b56bd",
+            measurementId: "G-X4JDRWDEDE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Fetch user phone from database to pre-fill
+                database.ref('users/' + user.uid).once('value').then(snapshot => {
+                    const data = snapshot.val();
+                    if (data && data.phone) {
+                        const phoneInput = document.getElementById('phonenumber');
+                        if (phoneInput && !phoneInput.value) {
+                            phoneInput.value = data.phone;
+                        }
+                    }
+                });
+            } else {
+                // Redirect if trying to pay without login
+                window.location.href = "{% url 'login' %}";
+            }
+        });
+    </script>
+
+</body>
+</html>
