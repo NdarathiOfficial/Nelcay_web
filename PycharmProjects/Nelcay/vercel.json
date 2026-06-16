@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "Nelcay/wsgi.py",
+      "src": "Nelcay/Nelcay/wsgi.py",
       "use": "@vercel/python"
     }
   ],
@@ -12,7 +12,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "Nelcay/wsgi.py"
+      "dest": "Nelcay/Nelcay/wsgi.py"
     }
   ]
 }
