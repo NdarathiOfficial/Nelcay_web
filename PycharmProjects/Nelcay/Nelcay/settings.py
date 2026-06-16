@@ -18,13 +18,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-w%w-tn0^99eu&5
 
 
 
-ALLOWED_HOSTS = [
-    'nelcay-web-pi.vercel.app',
-    'nelcay-e7uqogiyu-ndarathi-s-projects.vercel.app', # Add your specific deployment URL here
-    '.vercel.app',
-    'localhost',
-    '127.0.0.1'
-]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
